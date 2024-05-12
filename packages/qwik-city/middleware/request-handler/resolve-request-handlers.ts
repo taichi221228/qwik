@@ -514,6 +514,8 @@ export async function handleRedirect(requestEv: RequestEvent) {
           requestEv.status(200);
           requestEv.headers.delete('Location');
         }
+      } else {
+        throw requestEv.redirect(302, location); // TODO: This code is not working. Blocked by CORS policy.
       }
     }
   }
