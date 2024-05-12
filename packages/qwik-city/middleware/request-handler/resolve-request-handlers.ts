@@ -502,14 +502,18 @@ export async function handleRedirect(requestEv: RequestEvent) {
     const location = requestEv.headers.get('Location');
     const isRedirect = status >= 301 && status <= 308 && location;
     if (isRedirect) {
-      const adaptedLocation = makeQDataPath(location);
-      if (adaptedLocation) {
-        requestEv.headers.set('Location', adaptedLocation);
-        requestEv.getWritableStream().close();
-        return;
-      } else {
-        requestEv.status(200);
-        requestEv.headers.delete('Location');
+      const isExternal = location.startsWith('http://') || location.startsWith('https://');
+
+      if (!isExternal) {
+        const adaptedLocation = makeQDataPath(location);
+        if (adaptedLocation) {
+          requestEv.headers.set('Location', adaptedLocation);
+          requestEv.getWritableStream().close();
+          return;
+        } else {
+          requestEv.status(200);
+          requestEv.headers.delete('Location');
+        }
       }
     }
   }
